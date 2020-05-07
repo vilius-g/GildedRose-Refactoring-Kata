@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App;
 
+use InvalidArgumentException;
 use function in_array;
+use function min;
 
 final class GildedRose
 {
@@ -33,15 +35,7 @@ final class GildedRose
             }
 
             if ($this->qualityIncreasesWithAge($item)) {
-                $this->increaseQuality($item);
-                if (KnownItemName::BACKSTAGE_PASSES === $item->name) {
-                    if ($item->sell_in < 11) {
-                        $this->increaseQuality($item);
-                    }
-                    if ($item->sell_in < 6) {
-                        $this->increaseQuality($item);
-                    }
-                }
+                $this->increaseQuality($item, $this->getQualityIncrement($item));
             } else {
                 $this->decreaseQuality($item);
             }
@@ -127,37 +121,18 @@ final class GildedRose
     }
 
     /**
-     * Return whether quality can be increased for this item.
-     *
-     * @param Item $item
-     * @return bool
-     */
-    private function canIncreaseQuality(Item $item): bool
-    {
-        return $item->quality < self::QUALITY_MAX;
-    }
-
-    /**
      * Increase quality but only if allowed.
      *
      * @param Item $item
+     * @param int $amount
      */
-    private function increaseQuality(Item $item): void
+    private function increaseQuality(Item $item, int $amount = 1): void
     {
-        if ($this->canIncreaseQuality($item)) {
-            $this->doIncreaseQuality($item);
+        if ($amount <= 0) {
+            throw new InvalidArgumentException('$amount must be positive: '.$amount);
         }
-    }
 
-    /**
-     * Increase quality by one without any checks.
-     *
-     * @param Item $item
-     * @return int
-     */
-    private function doIncreaseQuality(Item $item): int
-    {
-        return ++$item->quality;
+        $item->quality = min($item->quality + $amount, self::QUALITY_MAX);
     }
 
     /**
@@ -191,5 +166,25 @@ final class GildedRose
     private function qualityResetsAfterExpiration(Item $item): bool
     {
         return KnownItemName::BACKSTAGE_PASSES === $item->name;
+    }
+
+    /**
+     * Return how much the quality should be increased.
+     *
+     * @param Item $item
+     * @return int
+     */
+    private function getQualityIncrement(Item $item): int
+    {
+        if (KnownItemName::BACKSTAGE_PASSES === $item->name) {
+            if ($item->sell_in <= 5) {
+                return 3;
+            }
+            if ($item->sell_in <= 10) {
+                return 2;
+            }
+        }
+
+        return 1;
     }
 }
