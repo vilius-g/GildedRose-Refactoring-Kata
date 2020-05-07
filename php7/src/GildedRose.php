@@ -21,6 +21,10 @@ final class GildedRose
     public function updateQuality(): void
     {
         foreach ($this->items as $item) {
+            if ($this->isLegendary($item)) {
+                continue;
+            }
+
             if (KnownItemName::AGED_BRIE !== $item->name && KnownItemName::BACKSTAGE_PASSES !== $item->name) {
                 $this->decreaseQuality($item);
             } elseif ($item->quality < 50) {
@@ -52,26 +56,13 @@ final class GildedRose
     }
 
     /**
-     * Return whether sell_in value be decreased for this item.
-     *
-     * @param Item $item
-     * @return bool
-     */
-    private function canDecreaseSellIn(Item $item): bool
-    {
-        return KnownItemName::SULFURAS !== $item->name;
-    }
-
-    /**
      * Decrease sell_in value for item.
      *
      * @param Item $item
      */
     private function decreaseSellIn(Item $item): void
     {
-        if ($this->canDecreaseSellIn($item)) {
-            --$item->sell_in;
-        }
+        --$item->sell_in;
     }
 
     /**
@@ -93,18 +84,18 @@ final class GildedRose
      */
     private function canDecreaseQuality(Item $item): bool
     {
-        return $item->quality > 0 && $this->canChangeQuality($item);
+        return $item->quality > 0;
     }
 
     /**
-     * Check if quality can be changed for this item.
+     * Is item legendary and cannot be altered.
      *
      * @param Item $item
      * @return bool
      */
-    private function canChangeQuality(Item $item): bool
+    private function isLegendary(Item $item): bool
     {
-        return KnownItemName::SULFURAS !== $item->name;
+        return KnownItemName::SULFURAS === $item->name;
     }
 
     /**
@@ -138,7 +129,7 @@ final class GildedRose
      */
     private function canIncreaseQuality(Item $item): bool
     {
-        return $item->quality < 50 && $this->canChangeQuality($item);
+        return $item->quality < 50;
     }
 
     /**
