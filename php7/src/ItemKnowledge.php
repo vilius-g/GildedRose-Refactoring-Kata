@@ -19,9 +19,6 @@ final class ItemKnowledge
 
     /**
      * Is item legendary and cannot be altered.
-     *
-     * @param Item $item
-     * @return bool
      */
     public function isLegendary(Item $item): bool
     {
@@ -30,9 +27,6 @@ final class ItemKnowledge
 
     /**
      * Does item quality increase with age.
-     *
-     * @param Item $item
-     * @return bool
      */
     public function qualityIncreasesWithAge(Item $item): bool
     {
@@ -41,9 +35,6 @@ final class ItemKnowledge
 
     /**
      * Does quality still increase after sell by date.
-     *
-     * @param Item $item
-     * @return bool
      */
     public function qualityIncreasesAfterExpiration(Item $item): bool
     {
@@ -52,9 +43,6 @@ final class ItemKnowledge
 
     /**
      * Does quality reset to zero after sell by date.
-     *
-     * @param Item $item
-     * @return bool
      */
     public function qualityResetsAfterExpiration(Item $item): bool
     {
@@ -63,9 +51,6 @@ final class ItemKnowledge
 
     /**
      * Return how much the quality should be increased.
-     *
-     * @param Item $item
-     * @return int
      */
     public function getQualityIncrement(Item $item): int
     {

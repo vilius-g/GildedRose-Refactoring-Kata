@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\TextTest;
 
-use PHPUnit\Framework\TestCase;
 use function file_get_contents;
 use function ob_get_clean;
 use function ob_start;
+use PHPUnit\Framework\TestCase;
 
 class GildedRoseTextTest extends TestCase
 {
@@ -20,8 +20,6 @@ class GildedRoseTextTest extends TestCase
 
     /**
      * Run fixture file and return its output.
-     *
-     * @return string
      */
     private function runTextTestFixture(): string
     {
