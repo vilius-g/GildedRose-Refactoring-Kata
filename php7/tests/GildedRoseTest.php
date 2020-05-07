@@ -8,13 +8,24 @@ use PHPUnit\Framework\TestCase;
 
 class GildedRoseTest extends TestCase
 {
-    public function testFoo(): void
+    /**
+     * Create GildedRose instance with a single item.
+     *
+     * @param Item $item
+     * @return GildedRose
+     */
+    private function createGildedRoseInstance(Item $item): GildedRose
     {
-        $items = [new Item('foo', 0, 0)];
-        $gildedRose = new GildedRose($items);
+        return new GildedRose([$item]);
+    }
+
+    public function testGenericItem(): void
+    {
+        $item = new Item('Generic Item', 0, 0);
+        $gildedRose = $this->createGildedRoseInstance($item);
         $gildedRose->updateQuality();
-        $this->assertEquals('foo', $items[0]->name);
-        $this->assertEquals(-1, $items[0]->sell_in);
-        $this->assertEquals(0, $items[0]->quality);
+        $this->assertEquals('Generic Item', $item->name);
+        $this->assertEquals(-1, $item->sell_in);
+        $this->assertEquals(0, $item->quality);
     }
 }
