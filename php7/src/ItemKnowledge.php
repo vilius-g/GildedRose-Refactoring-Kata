@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App;
 
+use function in_array;
+
 /**
  * Keeps knowledge of items and provides various answers about them.
  */
@@ -22,7 +24,7 @@ final class ItemKnowledge
      */
     public function isLegendary(Item $item): bool
     {
-        return KnownItemName::SULFURAS === $item->name;
+        return $this->itemMatches($item, KnownItemName::SULFURAS);
     }
 
     /**
@@ -30,7 +32,7 @@ final class ItemKnowledge
      */
     public function qualityIncreasesWithAge(Item $item): bool
     {
-        return in_array($item->name, [KnownItemName::AGED_BRIE, KnownItemName::BACKSTAGE_PASSES], true);
+        return $this->itemMatches($item, KnownItemName::AGED_BRIE, KnownItemName::BACKSTAGE_PASSES);
     }
 
     /**
@@ -38,7 +40,7 @@ final class ItemKnowledge
      */
     public function qualityIncreasesAfterExpiration(Item $item): bool
     {
-        return KnownItemName::AGED_BRIE === $item->name;
+        return $this->itemMatches($item, KnownItemName::AGED_BRIE);
     }
 
     /**
@@ -46,7 +48,7 @@ final class ItemKnowledge
      */
     public function qualityResetsAfterExpiration(Item $item): bool
     {
-        return KnownItemName::BACKSTAGE_PASSES === $item->name;
+        return $this->itemMatches($item, KnownItemName::BACKSTAGE_PASSES);
     }
 
     /**
@@ -54,7 +56,7 @@ final class ItemKnowledge
      */
     public function getQualityIncrement(Item $item): int
     {
-        if (KnownItemName::BACKSTAGE_PASSES === $item->name) {
+        if ($this->itemMatches($item, KnownItemName::BACKSTAGE_PASSES)) {
             if ($item->sell_in <= 5) {
                 return 3;
             }
@@ -71,10 +73,18 @@ final class ItemKnowledge
      */
     public function getQualityDecrement(Item $item): int
     {
-        if (KnownItemName::CONJURED === $item->name) {
+        if ($this->itemMatches($item, KnownItemName::CONJURED)) {
             return 2;
         }
 
         return 1;
+    }
+
+    /**
+     * Match item against known name
+     */
+    private function itemMatches(Item $item, string ...$name): bool
+    {
+        return in_array($item->name, $name, true);
     }
 }
