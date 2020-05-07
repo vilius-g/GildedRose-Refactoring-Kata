@@ -6,6 +6,7 @@ namespace App;
 
 use InvalidArgumentException;
 use function in_array;
+use function max;
 use function min;
 
 final class GildedRose
@@ -76,17 +77,6 @@ final class GildedRose
     }
 
     /**
-     * Check if quality can be decreased for this item.
-     *
-     * @param Item $item
-     * @return bool
-     */
-    private function canDecreaseQuality(Item $item): bool
-    {
-        return $item->quality > self::QUALITY_MIN;
-    }
-
-    /**
      * Is item legendary and cannot be altered.
      *
      * @param Item $item
@@ -104,9 +94,7 @@ final class GildedRose
      */
     private function decreaseQuality(Item $item): void
     {
-        if ($this->canDecreaseQuality($item)) {
-            --$item->quality;
-        }
+        $item->quality = max($item->quality - 1, self::QUALITY_MIN);
     }
 
     /**
