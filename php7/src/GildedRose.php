@@ -44,9 +44,9 @@ final class GildedRose
             $this->decreaseSellIn($item);
 
             if ($this->isExpired($item)) {
-                if (KnownItemName::AGED_BRIE === $item->name) {
+                if ($this->qualityIncreasesAfterExpiration($item)) {
                     $this->increaseQuality($item);
-                } elseif (KnownItemName::BACKSTAGE_PASSES === $item->name) {
+                } elseif ($this->qualityResetsAfterExpiration($item)) {
                     $this->resetQuality($item);
                 } else {
                     $this->decreaseQuality($item);
@@ -164,5 +164,27 @@ final class GildedRose
     private function qualityIncreasesWithAge(Item $item): bool
     {
         return in_array($item->name, [KnownItemName::AGED_BRIE, KnownItemName::BACKSTAGE_PASSES], true);
+    }
+
+    /**
+     * Does quality still increase after sell by date.
+     *
+     * @param Item $item
+     * @return bool
+     */
+    private function qualityIncreasesAfterExpiration(Item $item): bool
+    {
+        return KnownItemName::AGED_BRIE === $item->name;
+    }
+
+    /**
+     * Does quality reset to zero after sell by date.
+     *
+     * @param Item $item
+     * @return bool
+     */
+    private function qualityResetsAfterExpiration(Item $item): bool
+    {
+        return KnownItemName::BACKSTAGE_PASSES === $item->name;
     }
 }
