@@ -31,31 +31,39 @@ final class GildedRose
     }
 
     /**
-     * Adjust item quality after each day.
+     * Adjust quality values for all items after each day.
      */
     public function updateQuality(): void
     {
         foreach ($this->items as $item) {
-            if ($this->itemKnowledge->isLegendary($item)) {
-                continue;
-            }
+            $this->updateItemQuality($item);
+        }
+    }
 
-            if ($this->itemKnowledge->qualityIncreasesWithAge($item)) {
-                $this->increaseQuality($item, $this->itemKnowledge->getQualityIncrement($item));
+    /**
+     * Adjust quality for single item.
+     */
+    private function updateItemQuality(Item $item): void
+    {
+        if ($this->itemKnowledge->isLegendary($item)) {
+            return;
+        }
+
+        if ($this->itemKnowledge->qualityIncreasesWithAge($item)) {
+            $this->increaseQuality($item, $this->itemKnowledge->getQualityIncrement($item));
+        } else {
+            $this->decreaseQuality($item);
+        }
+
+        $this->decreaseSellIn($item);
+
+        if ($this->itemKnowledge->isExpired($item)) {
+            if ($this->itemKnowledge->qualityIncreasesAfterExpiration($item)) {
+                $this->increaseQuality($item);
+            } elseif ($this->itemKnowledge->qualityResetsAfterExpiration($item)) {
+                $this->resetQuality($item);
             } else {
                 $this->decreaseQuality($item);
-            }
-
-            $this->decreaseSellIn($item);
-
-            if ($this->itemKnowledge->isExpired($item)) {
-                if ($this->itemKnowledge->qualityIncreasesAfterExpiration($item)) {
-                    $this->increaseQuality($item);
-                } elseif ($this->itemKnowledge->qualityResetsAfterExpiration($item)) {
-                    $this->resetQuality($item);
-                } else {
-                    $this->decreaseQuality($item);
-                }
             }
         }
     }
