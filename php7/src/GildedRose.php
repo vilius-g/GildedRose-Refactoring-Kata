@@ -22,6 +22,9 @@ final class GildedRose
         $this->items = $items;
     }
 
+    /**
+     * Adjust item quality after each day.
+     */
     public function updateQuality(): void
     {
         foreach ($this->items as $item) {
