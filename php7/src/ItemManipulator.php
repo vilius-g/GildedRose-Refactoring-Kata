@@ -27,10 +27,7 @@ final class ItemManipulator
      */
     public function decreaseQuality(Item $item, int $amount = 1): void
     {
-        if ($amount <= 0) {
-            throw new InvalidArgumentException('$amount must be positive: '.$amount);
-        }
-
+        $this->validateAmountPositive($amount);
         $item->quality = max($item->quality - $amount, self::QUALITY_MIN);
     }
 
@@ -47,10 +44,17 @@ final class ItemManipulator
      */
     public function increaseQuality(Item $item, int $amount = 1): void
     {
+        $this->validateAmountPositive($amount);
+        $item->quality = min($item->quality + $amount, self::QUALITY_MAX);
+    }
+
+    /**
+     * Ensure that given value is positive.
+     */
+    private function validateAmountPositive(int $amount): void
+    {
         if ($amount <= 0) {
             throw new InvalidArgumentException('$amount must be positive: '.$amount);
         }
-
-        $item->quality = min($item->quality + $amount, self::QUALITY_MAX);
     }
 }
