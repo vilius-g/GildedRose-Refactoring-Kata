@@ -4,30 +4,32 @@ declare(strict_types=1);
 
 namespace App;
 
-use InvalidArgumentException;
-use function max;
-use function min;
-
 final class GildedRose
 {
-    private const QUALITY_MAX = 50;
-    private const QUALITY_MIN = 0;
     /** @var Item[] */
     private array $items;
     /**
      * @var ItemKnowledge
      */
     private ItemKnowledge $itemKnowledge;
+    /**
+     * @var ItemManipulator
+     */
+    private ItemManipulator $itemManipulator;
 
     /**
      * GildedRose constructor.
      * @param Item[] $items
      * @param ItemKnowledge $itemKnowledge
      */
-    public function __construct(array $items, ItemKnowledge $itemKnowledge = null)
-    {
+    public function __construct(
+        array $items,
+        ItemKnowledge $itemKnowledge = null,
+        ItemManipulator $itemManipulator = null
+    ) {
         $this->items = $items;
         $this->itemKnowledge = $itemKnowledge ?? new ItemKnowledge();
+        $this->itemManipulator = $itemManipulator ?? new ItemManipulator();
     }
 
     /**
@@ -50,67 +52,21 @@ final class GildedRose
         }
 
         if ($this->itemKnowledge->qualityIncreasesWithAge($item)) {
-            $this->increaseQuality($item, $this->itemKnowledge->getQualityIncrement($item));
+            $this->itemManipulator->increaseQuality($item, $this->itemKnowledge->getQualityIncrement($item));
         } else {
-            $this->decreaseQuality($item);
+            $this->itemManipulator->decreaseQuality($item);
         }
 
-        $this->decreaseSellIn($item);
+        $this->itemManipulator->decreaseSellIn($item);
 
         if ($this->itemKnowledge->isExpired($item)) {
             if ($this->itemKnowledge->qualityIncreasesAfterExpiration($item)) {
-                $this->increaseQuality($item);
+                $this->itemManipulator->increaseQuality($item);
             } elseif ($this->itemKnowledge->qualityResetsAfterExpiration($item)) {
-                $this->resetQuality($item);
+                $this->itemManipulator->resetQuality($item);
             } else {
-                $this->decreaseQuality($item);
+                $this->itemManipulator->decreaseQuality($item);
             }
         }
-    }
-
-    /**
-     * Decrease sell_in value for item.
-     *
-     * @param Item $item
-     */
-    private function decreaseSellIn(Item $item): void
-    {
-        --$item->sell_in;
-    }
-
-    /**
-     * Decrease quality by one but only if allowed for this item.
-     *
-     * @param Item $item
-     */
-    private function decreaseQuality(Item $item): void
-    {
-        $item->quality = max($item->quality - 1, self::QUALITY_MIN);
-    }
-
-    /**
-     * Reset quality to 0.
-     *
-     * @param Item $item
-     * @return int
-     */
-    private function resetQuality(Item $item): int
-    {
-        return $item->quality -= $item->quality;
-    }
-
-    /**
-     * Increase quality but only if allowed.
-     *
-     * @param Item $item
-     * @param int $amount
-     */
-    private function increaseQuality(Item $item, int $amount = 1): void
-    {
-        if ($amount <= 0) {
-            throw new InvalidArgumentException('$amount must be positive: '.$amount);
-        }
-
-        $item->quality = min($item->quality + $amount, self::QUALITY_MAX);
     }
 }
