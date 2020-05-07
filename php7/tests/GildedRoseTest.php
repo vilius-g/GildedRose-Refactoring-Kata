@@ -37,6 +37,7 @@ class GildedRoseTest extends TestCase
             'Backstage passes, 5 days or less' => [new Item('Backstage passes to a TAFKAL80ETC concert', 5, 1), 4, 4],
             'Backstage passes, expired' => [new Item('Backstage passes to a TAFKAL80ETC concert', 0, 1), -1, 0],
             'Backstage passes, max quality' => [new Item('Backstage passes to a TAFKAL80ETC concert', 1, 50), 0, 50],
+            'Backstage passes, almost max quality' => [new Item('Backstage passes to a TAFKAL80ETC concert', 1, 49), 0, 50],
         ];
     }
 
