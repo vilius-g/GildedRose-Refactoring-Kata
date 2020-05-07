@@ -65,4 +65,16 @@ final class ItemKnowledge
 
         return 1;
     }
+
+    /**
+     * Return how much the quality should be decreased.
+     */
+    public function getQualityDecrement(Item $item): int
+    {
+        if (KnownItemName::CONJURED === $item->name) {
+            return 2;
+        }
+
+        return 1;
+    }
 }

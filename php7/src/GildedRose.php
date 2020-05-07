@@ -54,7 +54,7 @@ final class GildedRose
         if ($this->itemKnowledge->qualityIncreasesWithAge($item)) {
             $this->itemManipulator->increaseQuality($item, $this->itemKnowledge->getQualityIncrement($item));
         } else {
-            $this->itemManipulator->decreaseQuality($item);
+            $this->itemManipulator->decreaseQuality($item, $this->itemKnowledge->getQualityDecrement($item));
         }
 
         $this->itemManipulator->decreaseSellIn($item);
@@ -65,7 +65,7 @@ final class GildedRose
             } elseif ($this->itemKnowledge->qualityResetsAfterExpiration($item)) {
                 $this->itemManipulator->resetQuality($item);
             } else {
-                $this->itemManipulator->decreaseQuality($item);
+                $this->itemManipulator->decreaseQuality($item, $this->itemKnowledge->getQualityDecrement($item));
             }
         }
     }

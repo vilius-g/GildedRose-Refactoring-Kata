@@ -23,11 +23,15 @@ final class ItemManipulator
     }
 
     /**
-     * Decrease quality by one but only if allowed for this item.
+     * Decrease item quality.
      */
-    public function decreaseQuality(Item $item): void
+    public function decreaseQuality(Item $item, int $amount = 1): void
     {
-        $item->quality = max($item->quality - 1, self::QUALITY_MIN);
+        if ($amount <= 0) {
+            throw new InvalidArgumentException('$amount must be positive: '.$amount);
+        }
+
+        $item->quality = max($item->quality - $amount, self::QUALITY_MIN);
     }
 
     /**
@@ -39,7 +43,7 @@ final class ItemManipulator
     }
 
     /**
-     * Increase quality but only if allowed.
+     * Increase item quality.
      */
     public function increaseQuality(Item $item, int $amount = 1): void
     {
