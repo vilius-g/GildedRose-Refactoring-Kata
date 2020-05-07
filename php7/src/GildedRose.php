@@ -8,6 +8,8 @@ use function in_array;
 
 final class GildedRose
 {
+    private const QUALITY_MAX = 50;
+    private const QUALITY_MIN = 0;
     /** @var Item[] */
     private array $items;
 
@@ -84,7 +86,7 @@ final class GildedRose
      */
     private function canDecreaseQuality(Item $item): bool
     {
-        return $item->quality > 0;
+        return $item->quality > self::QUALITY_MIN;
     }
 
     /**
@@ -129,7 +131,7 @@ final class GildedRose
      */
     private function canIncreaseQuality(Item $item): bool
     {
-        return $item->quality < 50;
+        return $item->quality < self::QUALITY_MAX;
     }
 
     /**
