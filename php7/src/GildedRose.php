@@ -42,14 +42,12 @@ final class GildedRose
             $this->decreaseSellIn($item);
 
             if ($this->isExpired($item)) {
-                if (KnownItemName::AGED_BRIE !== $item->name) {
-                    if (KnownItemName::BACKSTAGE_PASSES !== $item->name) {
-                        $this->decreaseQuality($item);
-                    } else {
-                        $this->resetQuality($item);
-                    }
-                } else {
+                if (KnownItemName::AGED_BRIE === $item->name) {
                     $this->increaseQuality($item);
+                } elseif (KnownItemName::BACKSTAGE_PASSES === $item->name) {
+                    $this->resetQuality($item);
+                } else {
+                    $this->decreaseQuality($item);
                 }
             }
         }
