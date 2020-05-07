@@ -22,17 +22,15 @@ final class GildedRose
     {
         foreach ($this->items as $item) {
             if (KnownItemName::AGED_BRIE !== $item->name && KnownItemName::BACKSTAGE_PASSES !== $item->name) {
-                if ($item->quality > 0 && KnownItemName::SULFURAS !== $item->name) {
-                    --$item->quality;
-                }
+                $this->decreaseQuality($item);
             } elseif ($item->quality < 50) {
-                ++$item->quality;
-                if (KnownItemName::BACKSTAGE_PASSES === $item->name && $item->quality < 50) {
+                $this->doIncreaseQuality($item);
+                if (KnownItemName::BACKSTAGE_PASSES === $item->name && $this->canIncreaseQuality($item)) {
                     if ($item->sell_in < 11) {
-                        ++$item->quality;
+                        $this->doIncreaseQuality($item);
                     }
                     if ($item->sell_in < 6) {
-                        ++$item->quality;
+                        $this->doIncreaseQuality($item);
                     }
                 }
             }
@@ -42,14 +40,12 @@ final class GildedRose
             if ($this->isExpired($item)) {
                 if (KnownItemName::AGED_BRIE !== $item->name) {
                     if (KnownItemName::BACKSTAGE_PASSES !== $item->name) {
-                        if ($item->quality > 0 && KnownItemName::SULFURAS !== $item->name) {
-                            --$item->quality;
-                        }
+                        $this->decreaseQuality($item);
                     } else {
-                        $item->quality -= $item->quality;
+                        $this->resetQuality($item);
                     }
-                } elseif ($item->quality < 50) {
-                    ++$item->quality;
+                } else {
+                    $this->increaseQuality($item);
                 }
             }
         }
@@ -87,5 +83,84 @@ final class GildedRose
     private function isExpired(Item $item): bool
     {
         return $item->sell_in < 0;
+    }
+
+    /**
+     * Check if quality can be decreased for this item.
+     *
+     * @param Item $item
+     * @return bool
+     */
+    private function canDecreaseQuality(Item $item): bool
+    {
+        return $item->quality > 0 && $this->canChangeQuality($item);
+    }
+
+    /**
+     * Check if quality can be changed for this item.
+     *
+     * @param Item $item
+     * @return bool
+     */
+    private function canChangeQuality(Item $item): bool
+    {
+        return KnownItemName::SULFURAS !== $item->name;
+    }
+
+    /**
+     * Decrease quality by one but only if allowed for this item.
+     *
+     * @param Item $item
+     */
+    private function decreaseQuality(Item $item): void
+    {
+        if ($this->canDecreaseQuality($item)) {
+            --$item->quality;
+        }
+    }
+
+    /**
+     * Reset quality to 0.
+     *
+     * @param Item $item
+     * @return int
+     */
+    private function resetQuality(Item $item): int
+    {
+        return $item->quality -= $item->quality;
+    }
+
+    /**
+     * Return whether quality can be increased for this item.
+     *
+     * @param Item $item
+     * @return bool
+     */
+    private function canIncreaseQuality(Item $item): bool
+    {
+        return $item->quality < 50 && $this->canChangeQuality($item);
+    }
+
+    /**
+     * Increase quality but only if allowed.
+     *
+     * @param Item $item
+     */
+    private function increaseQuality(Item $item): void
+    {
+        if ($this->canIncreaseQuality($item)) {
+            $this->doIncreaseQuality($item);
+        }
+    }
+
+    /**
+     * Increase quality by one without any checks.
+     *
+     * @param Item $item
+     * @return int
+     */
+    private function doIncreaseQuality(Item $item): int
+    {
+        return ++$item->quality;
     }
 }
