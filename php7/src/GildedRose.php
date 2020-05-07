@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App;
 
+use function in_array;
+
 final class GildedRose
 {
     /** @var Item[] */
@@ -25,18 +27,18 @@ final class GildedRose
                 continue;
             }
 
-            if (KnownItemName::AGED_BRIE !== $item->name && KnownItemName::BACKSTAGE_PASSES !== $item->name) {
-                $this->decreaseQuality($item);
-            } elseif ($item->quality < 50) {
-                $this->doIncreaseQuality($item);
-                if (KnownItemName::BACKSTAGE_PASSES === $item->name && $this->canIncreaseQuality($item)) {
+            if ($this->qualityIncreasesWithAge($item)) {
+                $this->increaseQuality($item);
+                if (KnownItemName::BACKSTAGE_PASSES === $item->name) {
                     if ($item->sell_in < 11) {
-                        $this->doIncreaseQuality($item);
+                        $this->increaseQuality($item);
                     }
                     if ($item->sell_in < 6) {
-                        $this->doIncreaseQuality($item);
+                        $this->increaseQuality($item);
                     }
                 }
+            } else {
+                $this->decreaseQuality($item);
             }
 
             $this->decreaseSellIn($item);
@@ -151,5 +153,16 @@ final class GildedRose
     private function doIncreaseQuality(Item $item): int
     {
         return ++$item->quality;
+    }
+
+    /**
+     * Does item quality increase with age.
+     *
+     * @param Item $item
+     * @return bool
+     */
+    private function qualityIncreasesWithAge(Item $item): bool
+    {
+        return in_array($item->name, [KnownItemName::AGED_BRIE, KnownItemName::BACKSTAGE_PASSES], true);
     }
 }
