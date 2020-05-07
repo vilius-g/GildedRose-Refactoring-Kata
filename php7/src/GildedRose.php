@@ -4,14 +4,19 @@ namespace App;
 
 final class GildedRose
 {
-    private $items = [];
+    /** @var Item[] */
+    private array $items;
 
-    public function __construct($items)
+    /**
+     * GildedRose constructor.
+     * @param Item[] $items
+     */
+    public function __construct(array $items)
     {
         $this->items = $items;
     }
 
-    public function updateQuality()
+    public function updateQuality(): void
     {
         foreach ($this->items as $item) {
             if (KnownItemName::AGED_BRIE != $item->name and KnownItemName::BACKSTAGE_PASSES != $item->name) {
