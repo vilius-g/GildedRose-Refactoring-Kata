@@ -4,13 +4,24 @@ declare(strict_types=1);
 
 namespace App;
 
-use function in_array;
-
 /**
  * Keeps knowledge of items and provides various answers about them.
  */
 final class ItemKnowledge
 {
+    /**
+     * @var ItemMatcher
+     */
+    private ItemMatcher $itemMatcher;
+
+    /**
+     * ItemKnowledge constructor.
+     */
+    public function __construct(ItemMatcher $itemMatcher)
+    {
+        $this->itemMatcher = $itemMatcher;
+    }
+
     /**
      * Return whether item has passed its sell_in date.
      */
@@ -24,7 +35,7 @@ final class ItemKnowledge
      */
     public function isLegendary(Item $item): bool
     {
-        return $this->itemMatches($item, KnownItemName::SULFURAS);
+        return $this->itemMatcher->matches($item, KnownItemName::SULFURAS);
     }
 
     /**
@@ -32,7 +43,7 @@ final class ItemKnowledge
      */
     public function qualityIncreasesWithAge(Item $item): bool
     {
-        return $this->itemMatches($item, KnownItemName::AGED_BRIE, KnownItemName::BACKSTAGE_PASSES);
+        return $this->itemMatcher->matches($item, KnownItemName::AGED_BRIE, KnownItemName::BACKSTAGE_PASSES);
     }
 
     /**
@@ -40,7 +51,7 @@ final class ItemKnowledge
      */
     public function qualityIncreasesAfterExpiration(Item $item): bool
     {
-        return $this->itemMatches($item, KnownItemName::AGED_BRIE);
+        return $this->itemMatcher->matches($item, KnownItemName::AGED_BRIE);
     }
 
     /**
@@ -48,7 +59,7 @@ final class ItemKnowledge
      */
     public function qualityResetsAfterExpiration(Item $item): bool
     {
-        return $this->itemMatches($item, KnownItemName::BACKSTAGE_PASSES);
+        return $this->itemMatcher->matches($item, KnownItemName::BACKSTAGE_PASSES);
     }
 
     /**
@@ -56,7 +67,7 @@ final class ItemKnowledge
      */
     public function getQualityIncrement(Item $item): int
     {
-        if ($this->itemMatches($item, KnownItemName::BACKSTAGE_PASSES)) {
+        if ($this->itemMatcher->matches($item, KnownItemName::BACKSTAGE_PASSES)) {
             if ($item->sell_in <= 5) {
                 return 3;
             }
@@ -73,18 +84,10 @@ final class ItemKnowledge
      */
     public function getQualityDecrement(Item $item): int
     {
-        if ($this->itemMatches($item, KnownItemName::CONJURED)) {
+        if ($this->itemMatcher->matches($item, KnownItemName::CONJURED)) {
             return 2;
         }
 
         return 1;
-    }
-
-    /**
-     * Match item against known name
-     */
-    private function itemMatches(Item $item, string ...$name): bool
-    {
-        return in_array($item->name, $name, true);
     }
 }

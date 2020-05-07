@@ -28,7 +28,7 @@ final class GildedRose
         ItemManipulator $itemManipulator = null
     ) {
         $this->items = $items;
-        $this->itemKnowledge = $itemKnowledge ?? new ItemKnowledge();
+        $this->itemKnowledge = $itemKnowledge ?? new ItemKnowledge(new ItemMatcher());
         $this->itemManipulator = $itemManipulator ?? new ItemManipulator();
     }
 
