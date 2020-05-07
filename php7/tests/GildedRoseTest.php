@@ -1,6 +1,9 @@
 <?php
 
-namespace App;
+namespace App\Tests;
+
+use App\GildedRose;
+use App\Item;
 
 class GildedRoseTest extends \PHPUnit\Framework\TestCase
 {
