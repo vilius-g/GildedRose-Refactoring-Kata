@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App;
 
 use InvalidArgumentException;
-use function in_array;
 use function max;
 use function min;
 
@@ -15,14 +14,20 @@ final class GildedRose
     private const QUALITY_MIN = 0;
     /** @var Item[] */
     private array $items;
+    /**
+     * @var ItemKnowledge
+     */
+    private ItemKnowledge $itemKnowledge;
 
     /**
      * GildedRose constructor.
      * @param Item[] $items
+     * @param ItemKnowledge $itemKnowledge
      */
-    public function __construct(array $items)
+    public function __construct(array $items, ItemKnowledge $itemKnowledge = null)
     {
         $this->items = $items;
+        $this->itemKnowledge = $itemKnowledge ?? new ItemKnowledge();
     }
 
     /**
@@ -31,22 +36,22 @@ final class GildedRose
     public function updateQuality(): void
     {
         foreach ($this->items as $item) {
-            if ($this->isLegendary($item)) {
+            if ($this->itemKnowledge->isLegendary($item)) {
                 continue;
             }
 
-            if ($this->qualityIncreasesWithAge($item)) {
-                $this->increaseQuality($item, $this->getQualityIncrement($item));
+            if ($this->itemKnowledge->qualityIncreasesWithAge($item)) {
+                $this->increaseQuality($item, $this->itemKnowledge->getQualityIncrement($item));
             } else {
                 $this->decreaseQuality($item);
             }
 
             $this->decreaseSellIn($item);
 
-            if ($this->isExpired($item)) {
-                if ($this->qualityIncreasesAfterExpiration($item)) {
+            if ($this->itemKnowledge->isExpired($item)) {
+                if ($this->itemKnowledge->qualityIncreasesAfterExpiration($item)) {
                     $this->increaseQuality($item);
-                } elseif ($this->qualityResetsAfterExpiration($item)) {
+                } elseif ($this->itemKnowledge->qualityResetsAfterExpiration($item)) {
                     $this->resetQuality($item);
                 } else {
                     $this->decreaseQuality($item);
@@ -63,28 +68,6 @@ final class GildedRose
     private function decreaseSellIn(Item $item): void
     {
         --$item->sell_in;
-    }
-
-    /**
-     * Return whether item has passed its sell_in date.
-     *
-     * @param Item $item
-     * @return bool
-     */
-    private function isExpired(Item $item): bool
-    {
-        return $item->sell_in < 0;
-    }
-
-    /**
-     * Is item legendary and cannot be altered.
-     *
-     * @param Item $item
-     * @return bool
-     */
-    private function isLegendary(Item $item): bool
-    {
-        return KnownItemName::SULFURAS === $item->name;
     }
 
     /**
@@ -121,58 +104,5 @@ final class GildedRose
         }
 
         $item->quality = min($item->quality + $amount, self::QUALITY_MAX);
-    }
-
-    /**
-     * Does item quality increase with age.
-     *
-     * @param Item $item
-     * @return bool
-     */
-    private function qualityIncreasesWithAge(Item $item): bool
-    {
-        return in_array($item->name, [KnownItemName::AGED_BRIE, KnownItemName::BACKSTAGE_PASSES], true);
-    }
-
-    /**
-     * Does quality still increase after sell by date.
-     *
-     * @param Item $item
-     * @return bool
-     */
-    private function qualityIncreasesAfterExpiration(Item $item): bool
-    {
-        return KnownItemName::AGED_BRIE === $item->name;
-    }
-
-    /**
-     * Does quality reset to zero after sell by date.
-     *
-     * @param Item $item
-     * @return bool
-     */
-    private function qualityResetsAfterExpiration(Item $item): bool
-    {
-        return KnownItemName::BACKSTAGE_PASSES === $item->name;
-    }
-
-    /**
-     * Return how much the quality should be increased.
-     *
-     * @param Item $item
-     * @return int
-     */
-    private function getQualityIncrement(Item $item): int
-    {
-        if (KnownItemName::BACKSTAGE_PASSES === $item->name) {
-            if ($item->sell_in <= 5) {
-                return 3;
-            }
-            if ($item->sell_in <= 10) {
-                return 2;
-            }
-        }
-
-        return 1;
     }
 }
