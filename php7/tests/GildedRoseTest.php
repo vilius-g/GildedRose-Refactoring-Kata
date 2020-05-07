@@ -19,13 +19,29 @@ class GildedRoseTest extends TestCase
         return new GildedRose([$item]);
     }
 
-    public function testGenericItem(): void
+    public function getItemData(): array
     {
-        $item = new Item('Generic Item', 0, 0);
+        return [
+           'Generic item, will sell in one day' => [new Item('Generic Item', 1, 3), 0, 2],
+           'Generic item, will sell today' => [new Item('Generic Item', 0, 2), -1, 0],
+           'Generic item, will sell yesterday' => [new Item('Generic Item', -1, 0), -2, 0],
+        ];
+    }
+
+    /**
+     * Test item update using provided test data
+     *
+     * @param Item $item
+     * @param int $expectedSellIn
+     * @param int $expectedQuality
+     * @dataProvider getItemData
+     */
+    public function testItem(Item $item, int $expectedSellIn, int $expectedQuality): void
+    {
         $gildedRose = $this->createGildedRoseInstance($item);
+
         $gildedRose->updateQuality();
-        $this->assertEquals('Generic Item', $item->name);
-        $this->assertEquals(-1, $item->sell_in);
-        $this->assertEquals(0, $item->quality);
+        $this->assertEquals($expectedSellIn, $item->sell_in);
+        $this->assertEquals($expectedQuality, $item->quality);
     }
 }
