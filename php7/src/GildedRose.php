@@ -22,25 +22,17 @@ final class GildedRose
     {
         foreach ($this->items as $item) {
             if (KnownItemName::AGED_BRIE !== $item->name && KnownItemName::BACKSTAGE_PASSES !== $item->name) {
-                if ($item->quality > 0) {
-                    if (KnownItemName::SULFURAS !== $item->name) {
-                        --$item->quality;
-                    }
+                if ($item->quality > 0 && KnownItemName::SULFURAS !== $item->name) {
+                    --$item->quality;
                 }
-            } else {
-                if ($item->quality < 50) {
-                    ++$item->quality;
-                    if (KnownItemName::BACKSTAGE_PASSES === $item->name) {
-                        if ($item->sell_in < 11) {
-                            if ($item->quality < 50) {
-                                ++$item->quality;
-                            }
-                        }
-                        if ($item->sell_in < 6) {
-                            if ($item->quality < 50) {
-                                ++$item->quality;
-                            }
-                        }
+            } elseif ($item->quality < 50) {
+                ++$item->quality;
+                if (KnownItemName::BACKSTAGE_PASSES === $item->name && $item->quality < 50) {
+                    if ($item->sell_in < 11) {
+                        ++$item->quality;
+                    }
+                    if ($item->sell_in < 6) {
+                        ++$item->quality;
                     }
                 }
             }
@@ -52,18 +44,14 @@ final class GildedRose
             if ($item->sell_in < 0) {
                 if (KnownItemName::AGED_BRIE !== $item->name) {
                     if (KnownItemName::BACKSTAGE_PASSES !== $item->name) {
-                        if ($item->quality > 0) {
-                            if (KnownItemName::SULFURAS !== $item->name) {
-                                --$item->quality;
-                            }
+                        if ($item->quality > 0 && KnownItemName::SULFURAS !== $item->name) {
+                            --$item->quality;
                         }
                     } else {
                         $item->quality -= $item->quality;
                     }
-                } else {
-                    if ($item->quality < 50) {
-                        ++$item->quality;
-                    }
+                } elseif ($item->quality < 50) {
+                    ++$item->quality;
                 }
             }
         }
