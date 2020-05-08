@@ -52,21 +52,37 @@ final class GildedRose
         }
 
         if ($this->itemKnowledge->qualityIncreasesWithAge($item)) {
-            $this->itemManipulator->increaseQuality($item, $this->itemKnowledge->getQualityIncrement($item));
+            $this->increaseQuality($item);
         } else {
-            $this->itemManipulator->decreaseQuality($item, $this->itemKnowledge->getQualityDecrement($item));
+            $this->decreaseQuality($item);
         }
 
         $this->itemManipulator->decreaseSellIn($item);
 
         if ($this->itemKnowledge->isExpired($item)) {
             if ($this->itemKnowledge->qualityIncreasesAfterExpiration($item)) {
-                $this->itemManipulator->increaseQuality($item);
+                $this->increaseQuality($item);
             } elseif ($this->itemKnowledge->qualityResetsAfterExpiration($item)) {
                 $this->itemManipulator->resetQuality($item);
             } else {
-                $this->itemManipulator->decreaseQuality($item, $this->itemKnowledge->getQualityDecrement($item));
+                $this->decreaseQuality($item);
             }
         }
+    }
+
+    /**
+     * Decrease item quality by appropriate amount.
+     */
+    private function decreaseQuality(Item $item): void
+    {
+        $this->itemManipulator->decreaseQuality($item, $this->itemKnowledge->getQualityDecrement($item));
+    }
+
+    /**
+     * Increase item quality by appropriate amount.
+     */
+    private function increaseQuality(Item $item): void
+    {
+        $this->itemManipulator->increaseQuality($item, $this->itemKnowledge->getQualityIncrement($item));
     }
 }
