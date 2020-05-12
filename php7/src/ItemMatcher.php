@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-use function in_array;
+use function preg_match;
 
 /**
  * Matches items against known ones.
@@ -16,6 +16,17 @@ final class ItemMatcher
      */
     public function matches(Item $item, string ...$name): bool
     {
-        return in_array($item->name, $name, true);
+        foreach ($name as $pattern) {
+            if ($this->nameMatchesPattern($item->name, $pattern)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function nameMatchesPattern(string $name, string $pattern): bool
+    {
+        return 1 === preg_match($pattern, $name);
     }
 }
